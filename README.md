@@ -71,3 +71,13 @@ No 4.2, o agente só precisa saber que existe uma ferramenta `criar_tarefa(titul
 todo o protocolo de transporte HTTP da API — host, porta, verbo, rota e formato
 do corpo —, deixando visível apenas a intenção (`criar_tarefa`, `listar_tarefas`)
 e seus argumentos. Esse é o ganho de abstração da Aula 6.
+
+## Resolução de problemas
+
+| Sintoma | Causa provável | Correção |
+| --- | --- | --- |
+| `tool_criar_chama_api` zerado | API 4.1 não está no ar | suba `uvicorn app.main:app --port 8000` no repo do 4.1 |
+| `cliente_teste.py` imprime texto extra | logs/prints antes do JSON | imprima só `json.dumps(...)` no stdout (logs vão para o stderr) |
+| `tools_expostos` falha | nome de ferramenta diferente | as tools precisam se chamar exatamente `criar_tarefa` e `listar_tarefas` |
+| `criar_resultado` sem `id` | ferramenta devolveu um stub | a tool tem que fazer o `POST` de verdade e retornar o JSON da API |
+| `listar_resultado` não é lista | parsing pegou só o primeiro bloco | `cliente_teste.py` normaliza qualquer formato do SDK para uma lista |
