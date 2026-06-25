@@ -8,10 +8,15 @@ Qualquer log deve ir para o stderr; o stdout carrega só o JSON.
 
 import asyncio
 import json
+import os
 import sys
 
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
+
+# Caminho absoluto do servidor, ao lado deste arquivo — funciona mesmo que o
+# autograder rode o cliente a partir de outro diretório de trabalho.
+SERVIDOR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "servidor_mcp.py")
 
 
 def _blocos_json(resultado):
@@ -54,7 +59,7 @@ def _parse_lista(resultado):
 
 
 async def main() -> dict:
-    params = StdioServerParameters(command=sys.executable, args=["servidor_mcp.py"])
+    params = StdioServerParameters(command=sys.executable, args=[SERVIDOR])
     async with stdio_client(params) as (read, write):
         async with ClientSession(read, write) as session:
             await session.initialize()
