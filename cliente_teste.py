@@ -3,16 +3,22 @@
 Sobe o servidor_mcp.py via stdio, exercita as duas ferramentas e imprime no
 stdout um ÚNICO envelope JSON (e nada mais). É esse envelope que o autograder lê.
 
-Qualquer log deve ir para o stderr; o stdout carrega só o JSON.
+O autograder funde stderr no stdout antes de fazer json.loads do resultado, então
+NADA pode ir para o stderr — nem logs do cliente nem do servidor. Por isso os logs
+são silenciados e o stderr do servidor é descartado (errlog).
 """
 
 import asyncio
 import json
+import logging
 import os
 import sys
 
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
+
+# Silencia qualquer logging deste processo (o do servidor é silenciado lá também).
+logging.disable(logging.CRITICAL)
 
 # Caminho absoluto do servidor, ao lado deste arquivo — funciona mesmo que o
 # autograder rode o cliente a partir de outro diretório de trabalho.
@@ -60,7 +66,9 @@ def _parse_lista(resultado):
 
 async def main() -> dict:
     params = StdioServerParameters(command=sys.executable, args=[SERVIDOR])
-    async with stdio_client(params) as (read, write):
+    # errlog=devnull: descarta o stderr do servidor para não poluir nossa saída.
+    devnull = open(os.devnull, "w")
+    async with stdio_client(params, errlog=devnull) as (read, write):
         async with ClientSession(read, write) as session:
             await session.initialize()
 

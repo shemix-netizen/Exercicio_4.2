@@ -7,8 +7,15 @@ sendo a fonte do dado.
     Agente / LLM  --MCP-->  este servidor  --HTTP-->  API 4.1 (localhost:8000)
 """
 
+import logging
+
 import httpx
 from mcp.server.fastmcp import FastMCP
+
+# Silencia logs do FastMCP e do httpx. O cliente herda o stderr deste processo;
+# o autograder funde stderr no stdout e faz json.loads do resultado, então
+# qualquer log ("Processing request...", "HTTP Request...") quebraria o parse.
+logging.disable(logging.CRITICAL)
 
 API = "http://localhost:8000"
 
